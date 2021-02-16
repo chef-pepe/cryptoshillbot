@@ -1,50 +1,11 @@
+import json
 import os
 import time
 
 import tweepy
 
-# TODO: extract into json
-FIRM_TO_BAGS = {
-    '@paradigm': [
-        'uniswap',
-        'optimism',
-        'argent',
-        'starkware',
-        'cosmos',
-        'compound'
-    ],
-    '@multicoincap': [
-        'algorand',
-        'arweave',
-        'dfinity',
-        'near',
-        'skale',
-        'solana',
-    ],
-    '@dragonfly_cap': [
-        '1inch',
-        'celo',
-        'cosmos',
-        'compound',
-        'dydx',
-        'opyn',
-        'uma'
-    ],
-    '@variantfund': [
-        'uniswap',
-        'reflexer',
-        'cozy finance',
-    ],
-    '@polychain': [
-        '0x',
-        'ava labs',
-        'celo',
-        'compound',
-        'dydx',
-        'dfinity',
-        'cosmos'
-    ]
-}
+with open('bags.json', 'r') as f:
+    FIRM_TO_BAGS = json.load(f)
 
 
 def build_api():
@@ -68,7 +29,7 @@ def build_api():
 
 
 def desc_to_bags(desc):
-    # TODO: are there other examples? may want to just test thsi for a bunch of VCs
+    # TODO: are there other examples? may want to just test this for a bunch of VCs
     tags = [w.lower().rstrip('.,;-!?') for w in desc.split(' ')]
 
     return dict((tag, FIRM_TO_BAGS[tag]) for tag in tags if tag in FIRM_TO_BAGS)

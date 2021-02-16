@@ -1,0 +1,41 @@
+{
+    "@paradigm": [
+        "uniswap",
+        "optimism",
+        "argent",
+        "starkware",
+        "cosmos",
+        "compound"
+    ],
+    "@multicoincap": [
+        "algorand",
+        "arweave",
+        "dfinity",
+        "near",
+        "skale",
+        "solana"
+    ],
+    "@dragonfly_cap": [
+        "1inch",
+        "celo",
+        "cosmos",
+        "compound",
+        "dydx",
+        "opyn",
+        "uma"
+    ],
+    "@variantfund": [
+        "uniswap",
+        "reflexer",
+        "cozy finance"
+    ],
+    "@polychain": [
+        "0x",
+        "ava labs",
+        "celo",
+        "compound",
+        "dydx",
+        "dfinity",
+        "cosmos"
+    ]
+}
