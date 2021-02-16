@@ -3,55 +3,48 @@ import os
 import tweepy
 
 FIRM_TO_BAGS = {
-    '@paradigm': {
+    '@paradigm': [
         'uniswap',
         'optimism',
         'argent',
         'starkware',
         'cosmos',
-        'compound',
-        'opyn'
-    },
-    '@multicoincap': {
+        'compound'
+    ],
+    '@multicoincap': [
         'algorand',
         'arweave',
         'dfinity',
-        'dune analytics',
-        'dfinity',
         'near',
-        'nervos',
         'skale',
         'solana',
-        'the graph'
-    },
-    '@dragonfly_cap': {
+    ],
+    '@dragonfly_cap': [
         '1inch',
         'celo',
         'cosmos',
         'compound',
         'dydx',
-        'maker',
         'opyn',
         'uma'
-    },
-    '@variantfund': {
+    ],
+    '@variantfund': [
         'uniswap',
         'reflexer',
         'cozy finance',
-        'goldfinch'
-    },
-    '@polychain': {
+    ],
+    '@polychain': [
         '0x',
-        'aleo',
         'ava labs',
         'celo',
         'compound',
         'dydx',
         'dfinity',
-        'maker',
         'cosmos'
-    }
+    ]
 }
+
+SHILLBOT_REPO = "https://github.com/chef-pepe/cryptoshillbot"
 
 
 def build_api():
@@ -81,23 +74,36 @@ def desc_to_bags(desc):
     return dict((tag, FIRM_TO_BAGS[tag]) for tag in tags if tag in FIRM_TO_BAGS)
 
 
-def formatted_bag_tweet(user, bags):
+def empty_bag_tweet(user_name):
+    return f"couldn't find any bags being shilled by {user_name}. perhaps their firm isn't being tracked by {os.getenv('SHILLBOT_HANDLE')} yet.\n\nif known bags are missing, submit an issue here: {SHILLBOT_REPO}."
+
+
+def formatted_bag_tweet(user_name, bags):
     # NOTE: basically the output for the tweet itself
     if len(bags) == 0:
-        return f"couldn't find any bags being shilled by {user.screen_name}. perhaps their firm isn't being tracked by @shillbot yet"
+        return empty_bag_tweet(user_name)
 
     else:
-        # TODO: format this output nicely
-        ...
+        tweet_lines = [
+            f"possible bags held by {user_name}:",
+        ]
+        for firm, bags in bags.items():
+            tweet_lines += [
+                f"\t{firm}:",
+            ]
+            tweet_lines += [f"\t- {bag}" for bag in bags]
+
+        tweet_lines += [f"\nif these bags are wrong, submit an issue here: {SHILLBOT_REPO}."]
+
+        return '\n'.join(tweet_lines)
 
 
-def get_bags(api, tweet_id):
+def get_bag_tweet(api, tweet_id):
     tweet = api.get_status(tweet_id)
 
     bags = desc_to_bags(tweet.user.description)
-    # TODO: format bag text
 
-    return bags
+    return formatted_bag_tweet(tweet.user, bags)
 
 
 UNSHILL_TEXT = f"{os.getenv('SHILLBOT_HANDLE')} unshill"
@@ -108,6 +114,7 @@ def get_mentions(api, since_id=1):
     mentions = []
     for tweet in tweepy.Cursor(api.mentions_timeline, since_id=since_id).items():
         # TODO: if tweet.text == UNSHILL_TEXT: get_shill(api, int(tweet.in_reply_to_status_id_str)), etc.
+        # also, only do it if tweet text should've changed! log here which ones we do as well
         mentions.append(tweet)
     return mentions
 
