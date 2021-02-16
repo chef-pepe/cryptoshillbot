@@ -72,7 +72,7 @@ def get_bag_tweet(api, tweet_id):
 
     bags = desc_to_bags(tweet.user.description)
 
-    return formatted_bag_tweet(tweet.user, bags)
+    return formatted_bag_tweet(tweet.user.screen_name, bags)
 
 
 UNSHILL_TEXT = f"{os.getenv('SHILLBOT_HANDLE')} unshill"
