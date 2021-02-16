@@ -81,7 +81,7 @@ UNSHILL_TEXT = f"{os.getenv('SHILLBOT_HANDLE')} unshill"
 def process_mention(api, mention):
     if mention.in_reply_to_status_id is not None and UNSHILL_TEXT in mention.text:
         bag_tweet = get_bag_tweet(api, mention.in_reply_to_status_id)
-        logger.info(f"responding to tweet {mention.id}")
+        logger.info(f"responding to tweet {mention.id} with {bag_tweet}")
         api.update_status(
             status=bag_tweet,
             in_reply_to_status_id=mention.id
