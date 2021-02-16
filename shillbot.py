@@ -54,7 +54,7 @@ def formatted_bag_tweet(user_name, bags):
 
     else:
         tweet_lines = [
-            f"possible bags held by {user_name}:",
+            f"possible bags held by @{user_name}:",
         ]
         for firm, bags in bags.items():
             tweet_lines += [
