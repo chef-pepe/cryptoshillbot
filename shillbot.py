@@ -44,8 +44,6 @@ FIRM_TO_BAGS = {
     ]
 }
 
-SHILLBOT_REPO = "https://github.com/chef-pepe/cryptoshillbot"
-
 
 def build_api():
     consumer_key = os.getenv('SHILLBOT_CONSUMER_KEY')
@@ -68,10 +66,13 @@ def build_api():
 
 
 def desc_to_bags(desc):
-    # TODO: are there other examples?
+    # TODO: are there other examples? may want to just test thsi for a bunch of VCs
     tags = [w.lower().rstrip('.,;-!?') for w in desc.split(' ')]
 
     return dict((tag, FIRM_TO_BAGS[tag]) for tag in tags if tag in FIRM_TO_BAGS)
+
+
+SHILLBOT_REPO = "https://github.com/chef-pepe/cryptoshillbot"
 
 
 def empty_bag_tweet(user_name):
@@ -109,13 +110,23 @@ def get_bag_tweet(api, tweet_id):
 UNSHILL_TEXT = f"{os.getenv('SHILLBOT_HANDLE')} unshill"
 
 
-def get_mentions(api, since_id=1):
+def process_mention(api, mention):
+    if mention.in_reply_to_status_id is not None and mention.text == UNSHILL_TEXT:
+        bag_tweet = get_bag_tweet(api, mention.in_reply_to_status_id)
+        api.update_status(
+            status=bag_tweet,
+            in_reply_to_status_id=mention.id
+        )
+
+
+def process_new_mentions(api, since_id=1):
     # NOTE: should be thoughtful about not re-doing replies!
-    mentions = []
-    for tweet in tweepy.Cursor(api.mentions_timeline, since_id=since_id).items():
-        # TODO: if tweet.text == UNSHILL_TEXT: get_shill(api, int(tweet.in_reply_to_status_id_str)), etc.
-        # also, only do it if tweet text should've changed! log here which ones we do as well
-        mentions.append(tweet)
+    new_since_id = since_id
+    for mention in tweepy.Cursor(api.mentions_timeline, since_id=since_id).items():
+        new_since_id = max(mention.id, new_since_id)
+
+        process_mention(api, mention)
+
     return mentions
 
 
