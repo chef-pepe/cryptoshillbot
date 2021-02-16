@@ -1,8 +1,13 @@
 import json
+import logging
 import os
 import time
 
 import tweepy
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
 
 with open('bags.json', 'r') as f:
     FIRM_TO_BAGS = json.load(f)
@@ -21,10 +26,10 @@ def build_api():
     try:
         api.verify_credentials()
     except Exception as e:
-        print('error building api')
+        logger.error('error building api')
         raise e
 
-    print('built api')
+    logger.info('built api')
     return api
 
 
@@ -76,7 +81,7 @@ UNSHILL_TEXT = f"{os.getenv('SHILLBOT_HANDLE')} unshill"
 def process_mention(api, mention):
     if mention.in_reply_to_status_id is not None and mention.text == UNSHILL_TEXT:
         bag_tweet = get_bag_tweet(api, mention.in_reply_to_status_id)
-        print(f"responding to tweet {mention.id}")
+        logger.info(f"responding to tweet {mention.id}")
         api.update_status(
             status=bag_tweet,
             in_reply_to_status_id=mention.id
@@ -100,11 +105,11 @@ SLEEP_SECS = 10
 def process_mention_loop(api, since_id):
     new_since_id = since_id
     while True:
-        print(f"processing mentions since tweet {new_since_id}")
+        logger.info(f"processing mentions since tweet {new_since_id}")
         new_since_id = process_new_mentions(api, new_since_id)
-        print(f"latest processed mention {new_since_id}")
+        logger.info(f"latest processed mention {new_since_id}")
 
-        print(f"sleeping for {SLEEP_SECS} secs")
+        logger.info(f"sleeping for {SLEEP_SECS} secs")
         time.sleep(SLEEP_SECS)
 
 
