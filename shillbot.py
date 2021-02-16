@@ -99,7 +99,7 @@ def process_new_mentions(api, since_id):
     return new_since_id
 
 
-SLEEP_SECS = 10
+SLEEP_SECS = 30
 
 
 def process_mention_loop(api, since_id):
