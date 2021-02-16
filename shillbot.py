@@ -1,7 +1,9 @@
 import os
+import time
 
 import tweepy
 
+# TODO: extract into json
 FIRM_TO_BAGS = {
     '@paradigm': [
         'uniswap',
@@ -113,13 +115,14 @@ UNSHILL_TEXT = f"{os.getenv('SHILLBOT_HANDLE')} unshill"
 def process_mention(api, mention):
     if mention.in_reply_to_status_id is not None and mention.text == UNSHILL_TEXT:
         bag_tweet = get_bag_tweet(api, mention.in_reply_to_status_id)
+        print(f"responding to tweet {mention.id}")
         api.update_status(
             status=bag_tweet,
             in_reply_to_status_id=mention.id
         )
 
 
-def process_new_mentions(api, since_id=1):
+def process_new_mentions(api, since_id):
     # NOTE: should be thoughtful about not re-doing replies!
     new_since_id = since_id
     for mention in tweepy.Cursor(api.mentions_timeline, since_id=since_id).items():
@@ -127,8 +130,34 @@ def process_new_mentions(api, since_id=1):
 
         process_mention(api, mention)
 
-    return mentions
+    return new_since_id
+
+
+SLEEP_SECS = 5
+
+
+def process_mention_loop(api, since_id):
+    new_since_id = since_id
+    while True:
+        print(f"processing mentions since tweet {new_since_id}")
+        new_since_id = process_new_mentions(api, new_since_id)
+        print(f"latest processed mention {new_since_id}")
+
+        print(f"sleeping for {SLEEP_SECS} secs")
+        time.sleep(SLEEP_SECS)
+
+
+def get_latest_replied_id(api):
+    latest_id = 1
+    for tweet in tweepy.Cursor(api.user_timeline).items():
+        if tweet.in_reply_to_status_id is not None:
+            latest_id = max(latest_id, tweet.in_reply_to_status_id)
+
+    return latest_id
 
 
 if __name__ == '__main__':
     api = build_api()
+    latest_replied_id = get_latest_replied_id(api)
+
+    process_mention_loop(api, latest_replied_id)
