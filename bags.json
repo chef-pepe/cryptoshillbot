@@ -5,12 +5,13 @@
         "argent",
         "starkware",
         "cosmos",
-        "compound"
+        "compound",
+        "reflexer",
+        "synthetix"
     ],
     "@multicoincap": [
         "algorand",
-        "arweave",
-        "dfinity",
+        "alpha homora",
         "near",
         "skale",
         "solana"
@@ -34,7 +35,6 @@
         "celo",
         "compound",
         "dydx",
-        "dfinity",
         "cosmos"
     ]
 }
