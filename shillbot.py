@@ -83,7 +83,7 @@ def process_mention(api, mention):
         bag_tweet = get_bag_tweet(api, mention.in_reply_to_status_id)
         logger.info(f"responding to tweet {mention.id} with {bag_tweet}")
         api.update_status(
-            status=bag_tweet,
+            status=f"@{mention.user.screen_name} {bag_tweet}",
             in_reply_to_status_id=mention.id
         )
 
